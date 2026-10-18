@@ -93,7 +93,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun prepareAssets() {
         val d = filesDir
-        if (VoiceEngine(this).modelsReady()) {
+        if (VoiceEngine(this, object : VoiceEngine.Callbacks {
+                override fun onState(state: String) {}
+                override fun onPartial(text: String) {}
+                override fun onFinal(text: String) {}
+                override fun onAnswer(text: String) {}
+                override fun onError(msg: String) {}
+            }).modelsReady()) {
             appendLog("✓ 模型已就绪，可直接启动\n")
             return
         }

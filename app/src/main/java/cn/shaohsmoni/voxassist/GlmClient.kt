@@ -69,12 +69,12 @@ object GlmClient {
             .header("Authorization", "Bearer ${cfg.apiKey}")
             .header("Content-Type", "application/json")
             .post(okhttp3.RequestBody.create(
-                okhttp3.MediaType.parse("application/json"), body.toString()))
+                okhttp3.MediaType.Companion.toMediaType("application/json"), body.toString()))
             .build()
 
         client.newCall(req).execute().use { resp ->
-            val text = resp.body()?.string() ?: ""
-            if (!resp.isSuccessful) throw RuntimeException("HTTP ${resp.code()}: ${text.take(200)}")
+            val text = resp.body.string()
+            if (!resp.isSuccessful) throw RuntimeException("HTTP ${resp.code}: ${text.take(200)}")
             val o = JSONObject(text)
             return o.getJSONArray("choices").getJSONObject(0)
                 .getJSONObject("message").getString("content").trim()

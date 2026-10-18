@@ -80,8 +80,14 @@ class VoiceEngine(
 
     fun stopPlayback() {
         speaking = false
-        try { player?.stop() } catch (_: Exception {}) {}
-        try { player?.release() } catch (_: Exception {}) {}
+        try {
+            player?.stop()
+        } catch (_: Exception) {
+        }
+        try {
+            player?.release()
+        } catch (_: Exception) {
+        }
         player = null
     }
 
@@ -226,7 +232,7 @@ class VoiceEngine(
                 while (asr!!.isReady(asrStream!!)) asr!!.decode(asrStream!!)
                 val text = asr!!.getResult(asrStream!!).text.trim()
 
-                if (sessionOn && speaking.not() && text.isNotEmpty() && text != lastPartial) {
+                if (sessionOn && !speaking && text.isNotEmpty() && text != lastPartial) {
                     lastPartial = text
                     callbacks.onPartial(text)
                 }
