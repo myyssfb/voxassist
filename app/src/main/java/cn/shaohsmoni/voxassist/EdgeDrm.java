@@ -238,7 +238,7 @@ public final class EdgeDrm {
     }
 
     private static int[] sha256Init(byte[] salt7) {
-        int[] words = new int[31]; // indices 0..30, zeros for 0..13
+        int[] words = new int[64]; // indices 0..30 filled here, 31..63 by expandSchedule
         words[14] = ((salt7[0] & 0xFF) << 16) | ((salt7[1] & 0xFF) << 8) | (salt7[2] & 0xFF);
         words[15] = ((salt7[3] & 0xFF) << 24) | ((salt7[4] & 0xFF) << 16)
                 | ((salt7[5] & 0xFF) << 8) | (salt7[6] & 0xFF);
