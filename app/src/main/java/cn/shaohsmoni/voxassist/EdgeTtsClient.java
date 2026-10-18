@@ -102,7 +102,7 @@ public class EdgeTtsClient {
             @Override public void onMessage(WebSocket ws, ByteString bytes) {
                 // binary frame: 2-byte big-endian header length, then headers, then payload
                 if (bytes.size() < 2) return;
-                int headerLen = ((bytes.get(0) & 0xFF) << 8) | (bytes.get(1) & 0xFF);
+                int headerLen = ((bytes.getByte(0) & 0xFF) << 8) | (bytes.getByte(1) & 0xFF);
                 String headers = bytes.substring(2, 2 + headerLen).utf8();
                 if (headers.contains("Path:audio")) {
                     if (bytes.size() > 2 + headerLen) {
