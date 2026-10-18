@@ -92,11 +92,26 @@ class VoiceEngine(
     }
 
     private fun releaseModels() {
-        try { asrStream?.release() } catch (_: Exception {}) {}
-        try { kwsStream?.release() } catch (_: Exception {}) {}
-        try { asr?.release() } catch (_: Exception {}) {}
-        try { kws?.release() } catch (_: Exception {}) {}
-        try { vad?.release() } catch (_: Exception {}) {}
+        try {
+            asrStream?.release()
+        } catch (_: Exception) {
+        }
+        try {
+            kwsStream?.release()
+        } catch (_: Exception) {
+        }
+        try {
+            asr?.release()
+        } catch (_: Exception) {
+        }
+        try {
+            kws?.release()
+        } catch (_: Exception) {
+        }
+        try {
+            vad?.release()
+        } catch (_: Exception) {
+        }
         asrStream = null; kwsStream = null; asr = null; kws = null; vad = null
     }
 
@@ -255,7 +270,10 @@ class VoiceEngine(
         } catch (e: Exception) {
             callbacks.onError("引擎异常: ${e.message}")
         } finally {
-            try { rec.stop() } catch (_: Exception {}) {}
+            try {
+                rec.stop()
+            } catch (_: Exception) {
+            }
             rec.release()
             releaseModels()
         }
