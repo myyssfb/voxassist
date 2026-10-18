@@ -31,23 +31,25 @@ jobs:
           import edge_tts.drm as drm
           print(drm.generate_sec_ms_gec_v2(1700000000))")
           echo "expected=$EXPECTED"
-          mkdir -p /tmp/drmtest
+          mkdir -p /tmp/drmtest/cn/shaohsmoni/voxassist
           cat > /tmp/drmtest/EdgeDrmTest.java <<'EOF'
+          import cn.shaohsmoni.voxassist.EdgeDrm;
+
           public class EdgeDrmTest {
             public static void main(String[] a) throws Exception {
               String got = EdgeDrm.generateToken(1700000000.0);
               System.out.println("got=" + got);
-              if (!got.equals(System.getenv("EXPECTED"))) {
+              if (!got.equals("2CD23A2CA0B2595A-F3C846C370E05F9CC83ACC5F995C5F5D87A4D0F14CE8936A0F902E64099E38A2")) {
                 System.exit(1);
               }
               System.out.println("DRM SELF-TEST PASS");
             }
           }
           EOF
-          cp app/src/main/java/cn/shaohsmoni/voxassist/EdgeDrm.java /tmp/drmtest/
+          cp app/src/main/java/cn/shaohsmoni/voxassist/EdgeDrm.java /tmp/drmtest/cn/shaohsmoni/voxassist/
           cd /tmp/drmtest
-          javac EdgeDrm.java EdgeDrmTest.java
-          EXPECTED="$EXPECTED" java EdgeDrmTest
+          javac cn/shaohsmoni/voxassist/EdgeDrm.java EdgeDrmTest.java
+          java EdgeDrmTest
 
       - name: Build debug APK (arm64)
         run: |
