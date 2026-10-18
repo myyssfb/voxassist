@@ -117,9 +117,9 @@ class VoiceEngine(
 
     fun modelsReady(): Boolean {
         val d = context.filesDir
-        return File(d, "encoder-epoch-99-avg-1.onnx").exists() &&
+        return File(d, "asr-encoder.int8.onnx").exists() &&
                 File(d, "silero_vad.onnx").exists() &&
-                File(d, "kws-encoder-epoch-12-avg-2-chunk-16-left-64.onnx").exists()
+                File(d, "kws-encoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx").exists()
     }
 
     private fun loop() {
@@ -144,9 +144,9 @@ class VoiceEngine(
                     featConfig = FeatureConfig(),
                     modelConfig = OnlineModelConfig(
                         transducer = OnlineTransducerModelConfig(
-                            encoder = "${d}/encoder-epoch-99-avg-1.onnx",
-                            decoder = "${d}/decoder-epoch-99-avg-1.onnx",
-                            joiner = "${d}/joiner-epoch-99-avg-1.onnx",
+                            encoder = "${d}/asr-encoder.int8.onnx",
+                            decoder = "${d}/asr-decoder.int8.onnx",
+                            joiner = "${d}/asr-joiner.int8.onnx",
                         ),
                         tokens = "${d}/tokens.txt",
                         numThreads = 2,
@@ -165,7 +165,7 @@ class VoiceEngine(
                     featConfig = FeatureConfig(),
                     modelConfig = OnlineModelConfig(
                         transducer = OnlineTransducerModelConfig(
-                            encoder = "${d}/kws-encoder-epoch-12-avg-2-chunk-16-left-64.onnx",
+                            encoder = "${d}/kws-encoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
                             decoder = "${d}/kws-decoder-epoch-12-avg-2-chunk-16-left-64.onnx",
                             joiner = "${d}/kws-joiner-epoch-12-avg-2-chunk-16-left-64.onnx",
                         ),

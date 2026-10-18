@@ -106,32 +106,26 @@ class MainActivity : AppCompatActivity() {
         appendLog("首次运行：下载模型（约 55MB，仅此一次）...\n")
         Thread {
             try {
-                // 1) ASR tarball
-                val asrTar = File(d, "asr.tar.bz2")
-                if (!asrTar.exists()) download(neededModels[0].first, asrTar)
-                untarSelective(asrTar, d, listOf(
-                    "encoder-epoch-99-avg-1.onnx",
-                    "decoder-epoch-99-avg-1.onnx",
-                    "joiner-epoch-99-avg-1.onnx",
-                    "tokens.txt"))
+                val BASE = "https://github.com/myyssfb/voxassist/releases/download/models-v1"
+                // 1) ASR (int8)
+                downloadIfNeeded("$BASE/asr-encoder.int8.onnx", File(d, "asr-encoder.int8.onnx"))
+                downloadIfNeeded("$BASE/asr-decoder.int8.onnx", File(d, "asr-decoder.int8.onnx"))
+                downloadIfNeeded("$BASE/asr-joiner.int8.onnx", File(d, "asr-joiner.int8.onnx"))
+                downloadIfNeeded("$BASE/tokens.txt", File(d, "tokens.txt"))
 
                 // 2) VAD
                 downloadIfNeeded(neededModels[1].first, File(d, "silero_vad.onnx"))
 
-                // 3) KWS tarball
-                val kwsTar = File(d, "kws.tar.bz2")
-                if (!kwsTar.exists()) download(neededModels[2].first, kwsTar)
-                untarSelective(kwsTar, d, listOf(
-                    "kws-encoder-epoch-12-avg-2-chunk-16-left-64.onnx",
-                    "kws-decoder-epoch-12-avg-2-chunk-16-left-64.onnx",
-                    "kws-joiner-epoch-12-avg-2-chunk-16-left-64.onnx",
-                    "kws-tokens.txt"))
+                // 3) KWS
+                downloadIfNeeded("$BASE/kws-encoder.int8.onnx", File(d, "kws-encoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx"))
+                downloadIfNeeded("$BASE/kws-decoder-epoch-12-avg-2-chunk-16-left-64.onnx", File(d, "kws-decoder-epoch-12-avg-2-chunk-16-left-64.onnx"))
+                downloadIfNeeded("$BASE/kws-joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx", File(d, "kws-joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx"))
+                downloadIfNeeded("$BASE/kws-tokens.txt", File(d, "kws-tokens.txt"))
 
                 // 4) keywords file (built-in)
                 val kw = File(d, "kws-keywords.txt")
                 if (!kw.exists()) kw.writeText(KEYWORDS)
 
-                asrTar.delete(); kwsTar.delete()
                 runOnUiThread { appendLog("✓ 模型全部就绪！点启动即可\n") }
             } catch (e: Exception) {
                 runOnUiThread { appendLog("✗ 下载失败: ${e.message}\n") }
@@ -163,27 +157,6 @@ class MainActivity : AppCompatActivity() {
         appendLog("  ✓ ${dest.name} (${dest.length() / 1048576}MB)\n")
     }
 
-    /** extract selected files (flattened) from a .tar.bz2 */
-    private fun untarSelective(tar: File, destDir: File, wanted: List<String>) {
-        val proc = ProcessBuilder("tar", "xjf", tar.absolutePath, "-C", destDir.absolutePath,
-            "--strip-components=2")
-            .redirectErrorStream(true)
-            .start()
-        val out = proc.inputStream.bufferedReader().readText()
-        proc.waitFor()
-        // verify all wanted files exist somewhere in destDir
-        for (w in wanted) {
-            val f = File(destDir, w)
-            if (!f.exists()) {
-                // search deeper
-                val found = destDir.walkTopDown().firstOrNull { it.name == w }
-                if (found != null && found.absolutePath != f.absolutePath) {
-                    found.copyTo(f, overwrite = true)
-                } else throw RuntimeException("解包缺少 $w\n$out")
-            }
-        }
-    }
-
     private fun startVoice() {
         appendLog("▶ 启动引擎...\n")
         val intent = Intent(this, VoiceService::class.java)
@@ -202,8 +175,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         // 你好小爱 + few fallbacks; format: token sequence @score
         val KEYWORDS = """
-            你 好 小 爱 @1.5
-            小 爱 同 学 @1.5
+            n ǐ h ǎo x iǎo ài @你好小爱 @1.5
+            x iǎo ài t óng x ué @小爱同学 @1.5
         """.trimIndent()
     }
 }
