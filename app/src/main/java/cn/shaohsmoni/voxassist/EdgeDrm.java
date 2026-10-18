@@ -101,12 +101,12 @@ public final class EdgeDrm {
 
     // ================= custom SHA-256 variant =================
 
-    private static int sigma0(int v) {
-        return (v >>> 7) ^ (v << 25) ^ (v >>> 18) ^ (v << 14) ^ (v >>> 3);
-    }
-
     private static int sigma1(int v) {
         return (v >>> 17) ^ (v << 15) ^ (v >>> 19) ^ (v << 13) ^ (v >>> 10);
+    }
+
+    private static int sigma0(int v) {
+        return (v >>> 7) ^ (v << 25) ^ (v >>> 18) ^ (v << 14) ^ (v >>> 3);
     }
 
     /**
@@ -248,8 +248,10 @@ public final class EdgeDrm {
                 | ((salt7[5] & 0xFF) << 8) | (salt7[6] & 0xFF);
         for (int i = 16; i < 30; i++) {
             int value = SHA256_SCHEDULE[i - 16];
-            if (i == 16) value ^= SIGMA1_ADJUSTMENT;
-            if (i - 2 >= 14) value += sigma1(words[i - 2]);
+            if (i - 2 >= 14) {
+                if (i == 16) value ^= SIGMA1_ADJUSTMENT;
+                value += sigma1(words[i - 2]);
+            }
             if (i - 7 >= 14) value += words[i - 7];
             if (i - 15 >= 14) {
                 if (i == 29) value ^= SIGMA0_ADJUSTMENT;
