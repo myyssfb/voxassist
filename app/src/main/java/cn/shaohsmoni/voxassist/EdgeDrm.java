@@ -335,7 +335,10 @@ public final class EdgeDrm {
         int factorB = keyB * CS64_FACTOR;
 
         int nCoeffs = CS64_COEFFS.length;
-        int[] ws = wordsLe4Even(data);
+        // reference feeds b"\x00" + data into the word splitter (little-endian alignment)
+        byte[] zeroData = new byte[data.length + 1];
+        System.arraycopy(data, 0, zeroData, 1, data.length);
+        int[] ws = wordsLe4Even(zeroData);
         int total = nCoeffs + ws.length;   // terms count (even since ws even)
         int[] terms = new int[total];
         int[] offsets = new int[total];
@@ -355,6 +358,8 @@ public final class EdgeDrm {
             offsets[nCoeffs + i] = offset;
         }
 
+        // Accumulators follow the Python reference exactly: swapAcc/swapLast masked
+        // at each step, acc/swapLast accumulate raw (int wrap), final XOR on raw values.
         int swapAcc = 0, swapLast = 0, state = 0, acc = 0;
         for (int i = 0; i < total; i += 2) {
             int x = terms[i], y = terms[i + 1];
@@ -380,20 +385,22 @@ public final class EdgeDrm {
             state = rol16(rol16(t2) * 0x7C932B89) * 0xBFA49F69;
             acc = acc + state;
         }
-        // swapAcc/acc may exceed 32 bits across iterations (as in Python) —
-        // mask only the final XOR inputs. Python masks at the same points:
-        // swap_acc was masked each iteration via (swap_acc + swap_last) & mask.
-        // We kept int wrap-around which is equivalent to & mask at every step,
-        // so simply XOR here.
         return new int[]{swapLast ^ state, swapAcc ^ acc};
     }
 
     private static String tokenHash(byte[] data) {
         byte[] digest = sha256Digest(data);
         int[] cs = cs64Digest(data, digest);
+        // reference: struct.pack("<II", w0, w1).hex().upper() — little-endian bytes per word
+        byte[] csBytes = new byte[8];
+        for (int w = 0; w < 2; w++) {
+            csBytes[4 * w]     = (byte) (cs[w]);
+            csBytes[4 * w + 1] = (byte) (cs[w] >>> 8);
+            csBytes[4 * w + 2] = (byte) (cs[w] >>> 16);
+            csBytes[4 * w + 3] = (byte) (cs[w] >>> 24);
+        }
         StringBuilder sb = new StringBuilder(81);
-        sb.append(String.format(Locale.ROOT, "%08X", cs[0]));
-        sb.append(String.format(Locale.ROOT, "%08X", cs[1]));
+        for (byte b : csBytes) sb.append(String.format(Locale.ROOT, "%02X", b));
         sb.append('-');
         for (byte b : digest) sb.append(String.format(Locale.ROOT, "%02X", b));
         return sb.toString();
