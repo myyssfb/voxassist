@@ -122,9 +122,9 @@ class MainActivity : AppCompatActivity() {
                 downloadIfNeeded("$BASE/kws-joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx", File(d, "kws-joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx"))
                 downloadIfNeeded("$BASE/kws-tokens.txt", File(d, "kws-tokens.txt"))
 
-                // 4) keywords file (built-in)
+                // 4) keywords file (built-in) — always rewrite to latest format
                 val kw = File(d, "kws-keywords.txt")
-                if (!kw.exists()) kw.writeText(KEYWORDS)
+                kw.writeText(KEYWORDS)
 
                 runOnUiThread { appendLog("✓ 模型全部就绪！点启动即可\n") }
             } catch (e: Exception) {
@@ -175,8 +175,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         // 你好小爱 + few fallbacks; format: token sequence @score
         val KEYWORDS = """
-            n ǐ h ǎo x iǎo ài @你好小爱 @1.5
-            x iǎo ài t óng x ué @小爱同学 @1.5
+            n ǐ h ǎo x iǎo ài @你好小爱
+            x iǎo ài t óng x ué @小爱同学
         """.trimIndent()
     }
 }

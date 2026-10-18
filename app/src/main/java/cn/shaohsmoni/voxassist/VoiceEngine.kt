@@ -176,7 +176,7 @@ class VoiceEngine(
                     keywordsFile = "${d}/kws-keywords.txt",
                     keywordsScore = 1.5f,
                     keywordsThreshold = 0.25f,
-                    numTrailingBlanks = 1,
+                    numTrailingBlanks = 2,
                 ),
             )
             vad = Vad(
