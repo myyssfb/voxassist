@@ -233,7 +233,12 @@ class VoiceEngine(
                 // ---- 2) VAD (speech presence for barge-in & session timeout) ----
                 vad!!.acceptWaveform(chunk)
                 var speechPresent = false
-                while (!vad!!.isEmpty()) { vad!!.front(); vad!!.pop(); speechPresent = true; vad!!.clear() }
+                while (!vad!!.empty()) {
+                    vad!!.front()
+                    vad!!.pop()
+                    speechPresent = true
+                    vad!!.clear()
+                }
                 if (speechPresent) lastSpeechAt = System.currentTimeMillis()
 
                 // barge-in: user talks while we speak -> cut playback
@@ -315,10 +320,10 @@ class VoiceEngine(
             var localPlayer: MediaPlayer? = null
 
             EdgeTtsClient().synthesize(
-                text = text,
-                voice = "zh-CN-XiaoxiaoNeural",
-                rate = "+20%",
-                sink = object : EdgeTtsClient.Sink {
+                text,
+                "zh-CN-XiaoxiaoNeural",
+                "+20%",
+                object : EdgeTtsClient.Sink {
                     override fun onAudio(mp3: ByteArray, isFinal: Boolean) {
                         if (mp3.isNotEmpty()) {
                             ttsFile.appendBytes(mp3)
