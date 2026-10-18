@@ -167,7 +167,7 @@ class VoiceEngine(
                         transducer = OnlineTransducerModelConfig(
                             encoder = "${d}/kws-encoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
                             decoder = "${d}/kws-decoder-epoch-12-avg-2-chunk-16-left-64.onnx",
-                            joiner = "${d}/kws-joiner-epoch-12-avg-2-chunk-16-left-64.onnx",
+                            joiner = "${d}/kws-joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
                         ),
                         tokens = "${d}/kws-tokens.txt",
                         numThreads = 1,
