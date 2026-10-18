@@ -142,8 +142,8 @@ public final class EdgeDrm {
         s[3] = c;          // new d = old c
         s[4] = ne;         // new e = old d + t1
         s[5] = e;          // new f = old e
-        s[6] = g;          // new g = old f
-        s[7] = h;          // new h = old g (unchanged)
+        s[6] = f;          // new g = old f
+        s[7] = g;          // new h = old g
     }
 
     private static int[] sha256Rounds(int[] state, int[] words, int firstRound, int[] constants) {
