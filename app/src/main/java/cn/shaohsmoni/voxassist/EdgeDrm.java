@@ -249,13 +249,13 @@ public final class EdgeDrm {
         for (int i = 16; i < 30; i++) {
             int value = SHA256_SCHEDULE[i - 16];
             if (i - 2 >= 14) {
-                if (i == 16) value ^= SIGMA1_ADJUSTMENT;
-                value += sigma1(words[i - 2]);
+                value += (i == 16) ? (sigma1(words[i - 2]) ^ SIGMA1_ADJUSTMENT)
+                                   : sigma1(words[i - 2]);
             }
             if (i - 7 >= 14) value += words[i - 7];
             if (i - 15 >= 14) {
-                if (i == 29) value ^= SIGMA0_ADJUSTMENT;
-                value += sigma0(words[i - 15]);
+                value += (i == 29) ? (sigma0(words[i - 15]) ^ SIGMA0_ADJUSTMENT)
+                                   : sigma0(words[i - 15]);
             }
             words[i] = value;
         }
